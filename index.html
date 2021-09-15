@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>exchange</title>
+    <link rel="stylesheet" href="fonts/css/all.css">
+    <link rel="stylesheet" href="/fonts/css/brands.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono&family=Ubuntu:ital@1&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <div class="main">
+        <p>Ilość do wymiany</p>
+        <input type="text" class="howmuch" required value="1">
+        <label for="cars">Sprzedaję</label>
+        <select id="in" name="cars" class="buttons">
+        </select>
+        <button type="button" class="reverse"><i class="fas fa-sync"></i></button>
+        <label for="cars">Kupuję</label>
+        <select id="out" name="cars" class="buttons">
+        </select>
+        <div><button class="submit">przelicz</button></div>
+        <div class="current">
+            
+        </div>
+   </div>
+  
+
+   <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Ubuntu', sans-serif;
+    }   
+
+    .main {
+        background: linear-gradient(45deg, #1145b8, #8daaeb);
+        min-height: 100vh;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        font-size: 2rem;
+    }
+    .main > * {
+        margin: 0.3rem;
+        padding: 0.3rem;
+    }
+    .reverse {
+        outline: none;
+        background-color: inherit;
+        font-size: 24px;
+        border:none;
+        cursor: pointer;
+    }
+    input, select {
+        text-align: center;
+        font-size: 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        outline: none;
+    }
+    button {
+        font-size: 24px;
+        outline: none;
+        background-color: inherit;
+        padding: 1rem;
+        color: white;
+        border: 1px solid white;
+        margin-top: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .submit:hover {
+        text-decoration: underline;
+    }
+    .reverse {
+        margin: 1rem;
+        transition: 0.5s all ease;
+    }
+    .reverse:hover {
+        color: red;
+        transform: scale(1.2) rotate(90deg);
+    }
+    .current {
+        color: white;
+    }
+    .howmuch {
+        font-size: 1.5rem;
+    }
+   </style>
+   <script>
+       const buttons = document.querySelectorAll('.buttons');
+       const main = document.querySelector('.main');
+       const input = document.querySelector('#in');
+       const output = document.querySelector('#out');
+        const reverseBtn = document.querySelector('.reverse');
+        const submitBtn = document.querySelector('.submit');
+        const howmuch = document.querySelector('.howmuch');
+       const api = "https://v6.exchangerate-api.com/v6/20e9c67a6df4b29f9012add6/latest/PLN";
+    const codes = "https://v6.exchangerate-api.com/v6/20e9c67a6df4b29f9012add6/codes";
+    let arr = [];
+
+
+
+    fetch(codes).then(data => data.json()).then(data => {
+        arr.push(...data.supported_codes);
+        let  items = arr.map(item => {
+            return `<option value="${item[0]}">(${item[0]}) ${item[1]}</option>`
+        }).join(' ');
+        input.innerHTML = items;
+        output.innerHTML = items;
+    })
+
+
+
+function exchange() {
+    const test =document.querySelector('#out');
+    const inputValue = document.querySelector('#in').value;
+    const outputValue = document.querySelector('#out').value;
+    const api = `https://v6.exchangerate-api.com/v6/20e9c67a6df4b29f9012add6/latest/${inputValue}`;
+    const howmuch = document.querySelector('.howmuch').value;
+    const currento = document.querySelector('.current');
+    fetch(api).then(data => data.json()).then(data => {
+        const current = data.conversion_rates[outputValue];
+        const howMany = current * howmuch;
+        currento.innerHTML = `<p>Otrzymasz:</p><p>${howMany.toFixed(2)} ${test.value}</p>`;
+
+    })
+
+};
+
+submitBtn.addEventListener('click', exchange)
+
+buttons.forEach(btn => btn.addEventListener('change', (e) => {
+    const currento = document.querySelector('.current');
+    if(e.target.id === 'in') {
+        if(e.target.value === output.value) {
+            output.value = output[0].value;
+            currento.innerText = 'wybierz inną walutę'
+        }
+    }
+    if(e.target.id === 'out') {
+        if(e.target.value === input.value) {
+            input.value = input[0].value;
+        }
+    }
+}))
+
+reverseBtn.addEventListener('click', () => {
+
+const left = document.querySelector('#in');
+const right = document.querySelector('#out');
+let one = left.value;
+let two = right.value;
+left.value = two;
+right.value = one;
+// left.innerHTML = right;
+
+})
+
+   </script>
+</body>
+</html>
